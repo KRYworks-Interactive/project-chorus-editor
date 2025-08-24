@@ -1,0 +1,50 @@
+version: '{build}'
+os: Visual Studio 2019
+configuration: Release
+platform: x86
+skip_tags: true
+before_build:
+- ps: >-
+    nuget restore
+build:
+  verbosity: minimal
+  publish_nuget: true
+  include_nuget_references: true
+after_build:
+- ps: >-
+    $artifacts = "Binaries\Ched"
+
+    New-Item -Type directory $artifacts
+
+    Get-ChildItem Ched\bin\$env:PLATFORM\$env:CONFIGURATION | Copy-Item -Destination $artifacts -Recurse -Container
+
+    Get-ChildItem $artifacts -File -Recurse -Exclude *.exe, *.dll, *.config, *.mp3 | Remove-Item
+
+    Get-ChildItem $artifacts\Addon -File -Recurse -Include basszxtune.dll | Remove-Item
+
+    $shell = New-Object -ComObject("WScript.Shell")
+
+    $wiki = $shell.CreateShortcut("$env:APPVEYOR_BUILD_FOLDER\$artifacts\Ched Wiki.url")
+
+    $wiki.TargetPath = "https://github.com/paralleltree/Ched/wiki"
+
+    $wiki.Save()
+artifacts:
+- path: Binaries
+  name: Ched
+deploy:
+- provider: GitHub
+  release: Ched
+  auth_token:
+    secure: KkbkUfg5iFaqdqxRAHRvPZv5+nfF99DyufxN6IijxL2TWoV3QTdkAkrnyNvIPt9+
+  artifact: Ched
+  draft: true
+  on:
+    branch: master
+- provider: NuGet
+  api_key: $(NUGET_API_KEY)
+  skip_symbols: false
+  on:
+    branch: master
+cache:
+- packages -> **\packages.config

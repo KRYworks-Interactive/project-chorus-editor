@@ -14,7 +14,7 @@ namespace Ched
     {
         internal static readonly string ApplicationName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
 
-        /// hi
+        
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

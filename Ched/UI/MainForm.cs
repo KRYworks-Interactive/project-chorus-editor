@@ -60,8 +60,8 @@ namespace Ched.UI
                 NoteView.Editable = CanEdit;
                 NoteView.LaneBorderLightColor = isPreviewMode ? Color.FromArgb(40, 40, 40) : Color.FromArgb(60, 60, 60);
                 NoteView.LaneBorderDarkColor = isPreviewMode ? Color.FromArgb(10, 10, 10) : Color.FromArgb(30, 30, 30);
-                NoteView.UnitLaneWidth = isPreviewMode ? 4 : ApplicationSettings.Default.UnitLaneWidth;
-                NoteView.ShortNoteHeight = isPreviewMode ? 4 : 5;
+                NoteView.UnitLaneWidth = isPreviewMode ? 30 : ApplicationSettings.Default.UnitLaneWidth;
+                NoteView.ShortNoteHeight = isPreviewMode ? 6 : 30;
                 NoteView.UnitBeatHeight = isPreviewMode ? 48 : ApplicationSettings.Default.UnitBeatHeight;
                 UpdateThumbHeight();
                 ZoomInButton.Enabled = CanZoomIn;
@@ -678,14 +678,14 @@ namespace Ched.UI
 
             WidenLaneWidthMenuItem.Click += (s, e) =>
             {
-                noteView.UnitLaneWidth += 4;
+                noteView.UnitLaneWidth += 12;
                 ApplicationSettings.Default.UnitLaneWidth = noteView.UnitLaneWidth;
                 WidenLaneWidthMenuItem.Enabled = CanWidenLaneWidth;
                 NarrowLaneWidthMenuItem.Enabled = CanNarrowLaneWidth;
             };
             NarrowLaneWidthMenuItem.Click += (s, e) =>
             {
-                noteView.UnitLaneWidth -= 4;
+                noteView.UnitLaneWidth -= 12;
                 ApplicationSettings.Default.UnitLaneWidth = noteView.UnitLaneWidth;
                 WidenLaneWidthMenuItem.Enabled = CanWidenLaneWidth;
                 NarrowLaneWidthMenuItem.Enabled = CanNarrowLaneWidth;

@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +33,7 @@ namespace Ched.UI
         private int EndTick { get; set; }
         private double elapsedTick;
         private Control SyncControl { get; }
+        private float? StoredUnitBeatHeight { get; set; }
         private Timer Timer { get; } = new Timer() { Interval = 4 };
 
         public bool Playing { get; private set; }
@@ -55,6 +56,10 @@ namespace Ched.UI
         {
             if (Playing) throw new InvalidOperationException();
             if (context == null) throw new ArgumentNullException("context");
+
+            var noteView = SyncControl.Controls.Find("noteView", true).FirstOrDefault() as NoteView;
+            StoredUnitBeatHeight = noteView?.UnitBeatHeight;
+
             PreviewContext = context;
             SoundManager.Register(ClapSource.FilePath);
             SoundManager.Register(context.MusicSource.FilePath);
@@ -117,12 +122,27 @@ namespace Ched.UI
         {
             Timer.Stop();
             Playing = false;
+            if (IsSupported) SoundManager.SetMusicSpeed(1.0);
             SoundManager.StopAll();
+
+            // Allow other components to handle the end of the preview first.
             Finished?.Invoke(this, EventArgs.Empty);
+
+            // Synchronously restore the vertical zoom. By running this after the Finished event,
+            // we ensure this is the final state, overriding any other adjustments made during cleanup.
+            SyncControl.InvokeIfRequired(() =>
+            {
+                var noteView = SyncControl.Controls.Find("noteView", true).FirstOrDefault() as NoteView;
+                if (noteView != null && !noteView.IsDisposed && StoredUnitBeatHeight.HasValue)
+                {
+                    noteView.UnitBeatHeight = StoredUnitBeatHeight.Value;
+                }
+            });
         }
 
         private void Tick(object sender, EventArgs e)
         {
+            if (!Playing) return;
             int now = Environment.TickCount;
             int elapsed = now - LastSystemTick;
             LastSystemTick = now;

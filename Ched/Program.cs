@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Ched.Configuration;
+using Ched.Localization;
 
 namespace Ched
 {
@@ -21,6 +23,14 @@ namespace Ched
         [STAThread]
         static void Main(string[] args)
         {
+            var culture = new CultureInfo("en-US");
+            System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+
+            ErrorStrings.Culture = culture;
+            FileFilterStrings.Culture = culture;
+            PluginStrings.Culture = culture;
+
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Application.ExecutablePath));
 
 #if !DEBUG
